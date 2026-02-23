@@ -15,33 +15,33 @@ const fadeUp = {
 const features = [
   {
     emoji: "📞",
-    title: "수신 즉시 감지",
-    desc: "전화가 올 때 자동으로 진상 여부를 확인합니다. 받기 전에 미리 알 수 있어요.",
+    title: "전화 오면 바로 확인",
+    desc: "예약 전화가 올 때 자동으로 진상 여부를 체크합니다. 받기 전에 미리 대비하세요.",
   },
   {
     emoji: "🚨",
     title: "실시간 경고",
-    desc: "진상으로 등록된 번호면 화면에 경고 오버레이가 뜹니다. 놓칠 수가 없어요.",
+    desc: "진상으로 등록된 번호면 화면에 빨간 경고가 뜹니다. 아이들한테 미리 알려줄 수 있어요.",
   },
   {
     emoji: "🔗",
-    title: "업소간 공유",
-    desc: "한 곳에서 등록하면 다른 업소에서도 확인 가능. 같은 진상에 두 번 당하지 마세요.",
+    title: "업소끼리 공유",
+    desc: "한 곳에서 당하면 다른 업소에서도 알 수 있습니다. 같은 진상에 두 번 당할 필요 없어요.",
   },
   {
     emoji: "🔒",
-    title: "번호 보호",
-    desc: "전화번호는 암호화 해시로만 저장됩니다. 원본 번호는 절대 서버에 올라가지 않아요.",
+    title: "번호 유출 걱정 없음",
+    desc: "전화번호는 암호화 처리됩니다. 고객 정보가 밖으로 새어나갈 일 없어요.",
   },
   {
     emoji: "📋",
-    title: "연락처 불러오기",
-    desc: "이미 저장해둔 진상 연락처? 한번에 불러와서 등록하세요. 메모도 자동 인식.",
+    title: "연락처에서 바로 등록",
+    desc: "이미 저장해둔 블랙 연락처? 한번에 불러와서 등록하세요. 메모도 자동 인식.",
   },
   {
     emoji: "📊",
-    title: "태그 시스템",
-    desc: "폭력, 먹튀, 행패, 스토커 등 태그로 분류. 어떤 유형인지 한눈에 파악.",
+    title: "태그로 유형 파악",
+    desc: "폭력, 먹튀, 행패, 스토커 등 태그로 분류. 어떤 유형인지 한눈에 보입니다.",
   },
 ];
 
@@ -122,15 +122,15 @@ export default function Home() {
             </div>
 
             <h1 className="text-5xl md:text-7xl font-black leading-tight tracking-tight mb-6">
-              전화 받기 전에
+              떠나간 에이스는
               <br />
-              <span className="text-brand-red">진상인지 알 수 있다면?</span>
+              <span className="text-brand-red">돌아오지 않습니다.</span>
             </h1>
 
             <p className="text-lg md:text-xl text-white/50 max-w-2xl mx-auto mb-10 leading-relaxed">
-              수신 전화만으로 진상 손님을 즉시 식별.
+              사슴같은 우리 아이들을 지켜주세요.
               <br />
-              업소간 블랙리스트 공유로 미리 대비하세요.
+              진상 손님, 전화 받기 전에 미리 알 수 있습니다.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -224,7 +224,7 @@ export default function Home() {
               FEATURES
             </motion.p>
             <motion.h2 variants={fadeUp} custom={1} className="text-4xl md:text-5xl font-black">
-              왜 얘진상인가요?
+              사장님이 지켜야 할 것
             </motion.h2>
           </motion.div>
 
@@ -507,12 +507,14 @@ export default function Home() {
           >
             <p className="text-6xl mb-6">🛡️</p>
             <h2 className="text-4xl md:text-5xl font-black mb-6">
-              더 이상 당하지 마세요
+              우리 아이들은
+              <br />
+              내가 지킨다.
             </h2>
             <p className="text-white/50 text-lg mb-10">
-              지금 바로 얘진상을 설치하고
+              한 번의 설치로 업소 전체를 보호하세요.
               <br />
-              진상 손님으로부터 업소를 보호하세요.
+              진상은 걸러내고, 에이스는 지켜내고.
             </p>
             <a
               href="/yae-jinsang.apk"
