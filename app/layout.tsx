@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     title: "얘진상 — 진상 손님 사전 차단 시스템",
     description: "수신 전화만으로 진상 손님을 즉시 식별",
     type: "website",
-    images: [{ url: "/og-logo.svg", width: 1200, height: 630 }],
+    images: [{ url: "/og-image.png", width: 1200, height: 630 }],
   },
 };
 
