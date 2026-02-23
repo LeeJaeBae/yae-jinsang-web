@@ -491,13 +491,13 @@ export default function Home() {
             </span>
           </div>
           <div className="flex gap-6 text-sm text-white/30">
-            <a href="#" className="hover:text-white/60 transition">
+            <a href="/terms" className="hover:text-white/60 transition">
               이용약관
             </a>
-            <a href="#" className="hover:text-white/60 transition">
+            <a href="/privacy" className="hover:text-white/60 transition">
               개인정보처리방침
             </a>
-            <a href="#" className="hover:text-white/60 transition">
+            <a href="/contact" className="hover:text-white/60 transition">
               문의하기
             </a>
           </div>
