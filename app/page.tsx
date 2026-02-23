@@ -442,6 +442,60 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Referral */}
+      <section className="py-32">
+        <div className="max-w-4xl mx-auto px-6">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <motion.p variants={fadeUp} custom={0} className="text-brand-red font-semibold mb-3">
+              REFERRAL
+            </motion.p>
+            <motion.h2 variants={fadeUp} custom={1} className="text-4xl md:text-5xl font-black">
+              추천하면 무료
+            </motion.h2>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="grid md:grid-cols-3 gap-5"
+          >
+            <div className="bg-brand-card border border-white/5 rounded-2xl p-8 text-center">
+              <p className="text-4xl mb-4">🎁</p>
+              <h3 className="text-lg font-bold mb-2">추천한 나</h3>
+              <p className="text-brand-red text-2xl font-black mb-1">1개월 무료</p>
+              <p className="text-white/40 text-sm">추천 1건당 구독 1개월 연장</p>
+            </div>
+            <div className="bg-brand-card border border-white/5 rounded-2xl p-8 text-center">
+              <p className="text-4xl mb-4">🎉</p>
+              <h3 className="text-lg font-bold mb-2">추천받은 상대</h3>
+              <p className="text-green-400 text-2xl font-black mb-1">첫 달 50% 할인</p>
+              <p className="text-white/40 text-sm">24,500원으로 시작</p>
+            </div>
+            <div className="bg-brand-card border border-white/5 rounded-2xl p-8 text-center">
+              <p className="text-4xl mb-4">♾️</p>
+              <h3 className="text-lg font-bold mb-2">제한 없음</h3>
+              <p className="text-white text-2xl font-black mb-1">무한 추천</p>
+              <p className="text-white/40 text-sm">10명 추천 = 10개월 무료!</p>
+            </div>
+          </motion.div>
+
+          <motion.p
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            className="text-center text-white/30 text-sm mt-8"
+          >
+            가입 후 앱에서 내 추천코드를 확인하고 공유하세요
+          </motion.p>
+        </div>
+      </section>
+
       {/* CTA / Download */}
       <section id="download" className="py-32 relative">
         <div className="absolute inset-0 bg-gradient-to-b from-brand-red/5 to-transparent" />
