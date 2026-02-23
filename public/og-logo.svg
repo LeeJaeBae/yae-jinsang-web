@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" fill="none">
+  <rect width="1200" height="630" fill="#0D0D0D"/>
+  
+  <!-- Glow -->
+  <circle cx="600" cy="280" r="200" fill="#FF3B30" opacity="0.06"/>
+  
+  <!-- Shield icon -->
+  <g transform="translate(520, 120)">
+    <path d="M80 0c-4 0-8 1.5-8 1.5S36 20 20 28c-6 3-10 9-10 16v40c0 44 32 74 74 94 2 1 4 1 6 1s4 0 6-1c42-20 74-50 74-94V44c0-7-4-13-10-16C144 20 89 1.5 89 1.5S85 0 81 0h-1z" fill="#FF3B30"/>
+    <path d="M80 12c-2 0-4 .5-4 .5S44 27 30 34c-3 1.5-5 4.5-5 8v36c0 38 28 64 60 82 32-18 60-44 60-82V42c0-3.5-2-6.5-5-8C126 27 85 12.5 85 12.5S83 12 81 12h-1z" fill="#1A1A1A"/>
+    <rect x="72" y="38" width="16" height="60" rx="8" fill="#FF3B30"/>
+    <circle cx="80" cy="118" r="10" fill="#FF3B30"/>
+  </g>
+  
+  <!-- Text -->
+  <text x="600" y="380" text-anchor="middle" fill="white" font-family="system-ui, sans-serif" font-size="72" font-weight="900">얘진상</text>
+  <text x="600" y="430" text-anchor="middle" fill="#FF6B6B" font-family="system-ui, sans-serif" font-size="28" font-weight="500">진상 손님 사전 차단 시스템</text>
+  
+  <!-- Bottom line -->
+  <rect x="250" y="480" width="700" height="1" fill="#FF3B30" opacity="0.3"/>
+  <text x="600" y="520" text-anchor="middle" fill="rgba(255,255,255,0.3)" font-family="system-ui, sans-serif" font-size="18">© 2026 더 비스포크</text>
+</svg>
