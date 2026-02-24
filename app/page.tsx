@@ -517,7 +517,7 @@ export default function Home() {
               진상은 걸러내고, 에이스는 지켜내고.
             </p>
             <a
-              href="/yae-jinsang.apk"
+              href="https://github.com/LeeJaeBae/yae-jinsang/releases/latest/download/app-release.apk"
               className="inline-flex items-center gap-3 bg-brand-red hover:bg-brand-red/80 text-white font-bold text-lg px-10 py-5 rounded-2xl transition animate-pulse-glow"
             >
               <svg
@@ -530,7 +530,7 @@ export default function Home() {
               Android APK 다운로드
             </a>
             <p className="text-white/30 text-sm mt-4">
-              안드로이드 10 이상 · 49MB
+              안드로이드 10 이상 · 51MB
             </p>
           </motion.div>
         </div>
