@@ -105,8 +105,8 @@ export default function AdminPage() {
     setShops(enriched);
     setStats({
       total: enriched.length,
-      active: enriched.filter((s: Shop) => s.subscription_until && new Date(s.subscription_until) > now).length,
-      expired: enriched.filter((s: Shop) => !s.subscription_until || new Date(s.subscription_until) <= now).length,
+      active: enriched.filter((s: Shop) => s.is_active && s.subscription_until && new Date(s.subscription_until) > now).length,
+      expired: enriched.filter((s: Shop) => !s.is_active || !s.subscription_until || new Date(s.subscription_until) <= now).length,
       tags: (tagsData || []).length,
     });
     setDataLoading(false);
@@ -477,7 +477,7 @@ export default function AdminPage() {
         <div className="space-y-3">
           {filteredShops.map((shop) => {
             const isActive =
-              shop.subscription_until && new Date(shop.subscription_until) > new Date();
+              shop.is_active && shop.subscription_until && new Date(shop.subscription_until) > new Date();
             const daysLeft = shop.subscription_until
               ? Math.ceil(
                   (new Date(shop.subscription_until).getTime() - Date.now()) / 86400000
