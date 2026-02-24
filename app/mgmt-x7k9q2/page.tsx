@@ -456,7 +456,7 @@ export default function AdminPage() {
         )}
 
         {/* Search + Refresh */}
-        {tab === "shops" && <div className="flex gap-3 mb-6">
+        {tab === "shops" && <><div className="flex gap-3 mb-6">
           <input
             type="text"
             value={search}
@@ -551,7 +551,7 @@ export default function AdminPage() {
               {search ? "검색 결과 없음" : "등록된 업소가 없습니다"}
             </div>
           )}
-        </div>}
+        </div></>}
       </div>
     </main>
   );
