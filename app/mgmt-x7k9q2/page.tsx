@@ -35,6 +35,23 @@ export default function AdminPage() {
   const [stats, setStats] = useState({ total: 0, active: 0, expired: 0, tags: 0 });
   const [search, setSearch] = useState("");
   const [actionMsg, setActionMsg] = useState("");
+  const [tab, setTab] = useState<"shops" | "notices">("shops");
+
+  // 공지사항
+  interface Notice {
+    id: string;
+    title: string;
+    content: string;
+    category: string;
+    is_pinned: boolean;
+    created_at: string;
+  }
+  const [notices, setNotices] = useState<Notice[]>([]);
+  const [noticeTitle, setNoticeTitle] = useState("");
+  const [noticeContent, setNoticeContent] = useState("");
+  const [noticeCategory, setNoticeCategory] = useState("공지");
+  const [noticePinned, setNoticePinned] = useState(false);
+  const [editingNotice, setEditingNotice] = useState<string | null>(null);
 
   // 세션 체크
   useEffect(() => {
@@ -95,9 +112,21 @@ export default function AdminPage() {
     setDataLoading(false);
   }, [isAdmin]);
 
+  const loadNotices = useCallback(async () => {
+    const { data } = await supabase
+      .from("notices")
+      .select("*")
+      .order("is_pinned", { ascending: false })
+      .order("created_at", { ascending: false });
+    setNotices((data || []) as Notice[]);
+  }, []);
+
   useEffect(() => {
-    if (isAdmin) loadData();
-  }, [isAdmin, loadData]);
+    if (isAdmin) {
+      loadData();
+      loadNotices();
+    }
+  }, [isAdmin, loadData, loadNotices]);
 
   const showAction = (msg: string) => {
     setActionMsg(msg);
@@ -129,6 +158,58 @@ export default function AdminPage() {
     await supabase.from("shops").update({ is_active: active }).eq("id", shopId);
     showAction(`${active ? "✅ 활성화" : "🚫 정지"}: ${shop?.name}`);
     loadData();
+  };
+
+  const saveNotice = async () => {
+    if (!noticeTitle.trim() || !noticeContent.trim()) {
+      showAction("❌ 제목과 내용을 입력하세요");
+      return;
+    }
+
+    if (editingNotice) {
+      await supabase.from("notices").update({
+        title: noticeTitle,
+        content: noticeContent,
+        category: noticeCategory,
+        is_pinned: noticePinned,
+      }).eq("id", editingNotice);
+      showAction("✅ 공지 수정 완료");
+    } else {
+      await supabase.from("notices").insert({
+        title: noticeTitle,
+        content: noticeContent,
+        category: noticeCategory,
+        is_pinned: noticePinned,
+      });
+      showAction("✅ 공지 등록 완료");
+    }
+
+    setNoticeTitle("");
+    setNoticeContent("");
+    setNoticeCategory("공지");
+    setNoticePinned(false);
+    setEditingNotice(null);
+    loadNotices();
+  };
+
+  const editNotice = (notice: Notice) => {
+    setEditingNotice(notice.id);
+    setNoticeTitle(notice.title);
+    setNoticeContent(notice.content);
+    setNoticeCategory(notice.category);
+    setNoticePinned(notice.is_pinned);
+  };
+
+  const deleteNotice = async (id: string) => {
+    if (!confirm("정말 삭제하시겠습니까?")) return;
+    await supabase.from("notices").delete().eq("id", id);
+    showAction("🗑️ 공지 삭제 완료");
+    loadNotices();
+  };
+
+  const togglePin = async (id: string, pinned: boolean) => {
+    await supabase.from("notices").update({ is_pinned: !pinned }).eq("id", id);
+    loadNotices();
   };
 
   const filteredShops = shops.filter(
@@ -235,8 +316,147 @@ export default function AdminPage() {
           ))}
         </div>
 
+        {/* Tabs */}
+        <div className="flex gap-2 mb-6">
+          {(["shops", "notices"] as const).map((t) => (
+            <button
+              key={t}
+              onClick={() => setTab(t)}
+              className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition ${
+                tab === t
+                  ? "bg-[#FF3B30] text-white"
+                  : "bg-[#1A1A1A] text-white/40 hover:text-white/60"
+              }`}
+            >
+              {t === "shops" ? `🏪 업소 관리 (${stats.total})` : `📢 공지사항 (${notices.length})`}
+            </button>
+          ))}
+        </div>
+
+        {tab === "notices" && (
+          <div className="space-y-6 mb-8">
+            {/* 공지 작성 */}
+            <div className="bg-[#1A1A1A] border border-white/5 rounded-2xl p-6">
+              <h3 className="font-bold text-lg mb-4">
+                {editingNotice ? "✏️ 공지 수정" : "📝 새 공지 작성"}
+              </h3>
+              <div className="space-y-3">
+                <div className="flex gap-3">
+                  <select
+                    value={noticeCategory}
+                    onChange={(e) => setNoticeCategory(e.target.value)}
+                    className="bg-[#252525] border border-white/10 rounded-xl px-4 py-2.5 text-sm focus:outline-none"
+                  >
+                    <option value="공지">📢 공지</option>
+                    <option value="업데이트">🆕 업데이트</option>
+                    <option value="이벤트">🎉 이벤트</option>
+                    <option value="점검">🔧 점검</option>
+                  </select>
+                  <label className="flex items-center gap-2 text-sm text-white/50 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={noticePinned}
+                      onChange={(e) => setNoticePinned(e.target.checked)}
+                      className="accent-[#FF3B30]"
+                    />
+                    📌 고정
+                  </label>
+                </div>
+                <input
+                  type="text"
+                  value={noticeTitle}
+                  onChange={(e) => setNoticeTitle(e.target.value)}
+                  placeholder="제목"
+                  className="w-full bg-[#252525] border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#FF3B30]/40"
+                />
+                <textarea
+                  value={noticeContent}
+                  onChange={(e) => setNoticeContent(e.target.value)}
+                  placeholder="내용"
+                  rows={4}
+                  className="w-full bg-[#252525] border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#FF3B30]/40 resize-y"
+                />
+                <div className="flex gap-2">
+                  <button
+                    onClick={saveNotice}
+                    className="bg-[#FF3B30] hover:bg-[#FF3B30]/80 text-white font-bold px-6 py-2.5 rounded-xl text-sm transition"
+                  >
+                    {editingNotice ? "수정 완료" : "등록"}
+                  </button>
+                  {editingNotice && (
+                    <button
+                      onClick={() => {
+                        setEditingNotice(null);
+                        setNoticeTitle("");
+                        setNoticeContent("");
+                        setNoticeCategory("공지");
+                        setNoticePinned(false);
+                      }}
+                      className="bg-[#252525] hover:bg-[#333] text-white/50 px-6 py-2.5 rounded-xl text-sm transition"
+                    >
+                      취소
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* 공지 목록 */}
+            <div className="space-y-3">
+              {notices.map((notice) => (
+                <div
+                  key={notice.id}
+                  className={`bg-[#1A1A1A] border rounded-2xl p-5 ${
+                    notice.is_pinned ? "border-[#FF3B30]/30" : "border-white/5"
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-xs bg-white/10 px-2 py-0.5 rounded-full">
+                          {notice.category === "공지" ? "📢" : notice.category === "업데이트" ? "🆕" : notice.category === "이벤트" ? "🎉" : "🔧"} {notice.category}
+                        </span>
+                        {notice.is_pinned && <span className="text-xs">📌</span>}
+                        <span className="text-xs text-white/20">
+                          {new Date(notice.created_at).toLocaleDateString("ko")}
+                        </span>
+                      </div>
+                      <h4 className="font-bold truncate">{notice.title}</h4>
+                      <p className="text-sm text-white/40 line-clamp-2 mt-1">{notice.content}</p>
+                    </div>
+                    <div className="flex gap-2 shrink-0">
+                      <button
+                        onClick={() => togglePin(notice.id, notice.is_pinned)}
+                        className="text-xs bg-white/5 hover:bg-white/10 px-3 py-2 rounded-lg transition"
+                        title={notice.is_pinned ? "고정 해제" : "고정"}
+                      >
+                        {notice.is_pinned ? "📌" : "📍"}
+                      </button>
+                      <button
+                        onClick={() => editNotice(notice)}
+                        className="text-xs bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 px-3 py-2 rounded-lg transition"
+                      >
+                        수정
+                      </button>
+                      <button
+                        onClick={() => deleteNotice(notice.id)}
+                        className="text-xs bg-red-500/20 hover:bg-red-500/30 text-red-400 px-3 py-2 rounded-lg transition"
+                      >
+                        삭제
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              {notices.length === 0 && (
+                <div className="text-center py-20 text-white/20">등록된 공지가 없습니다</div>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Search + Refresh */}
-        <div className="flex gap-3 mb-6">
+        {tab === "shops" && <div className="flex gap-3 mb-6">
           <input
             type="text"
             value={search}
@@ -331,7 +551,7 @@ export default function AdminPage() {
               {search ? "검색 결과 없음" : "등록된 업소가 없습니다"}
             </div>
           )}
-        </div>
+        </div>}
       </div>
     </main>
   );
