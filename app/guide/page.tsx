@@ -25,32 +25,22 @@ const sections = [
     ],
   },
   {
-    title: "2. 홈 화면 기능 안내",
-    desc: "처음 진입하면 각 기능을 하나씩 안내하는 코치마크가 표시됩니다. 탭하면 다음 단계로 넘어가요.",
-    images: [
-      { src: "/guide/05_coach1.png", caption: "태그 관리" },
-      { src: "/guide/06_coach2.png", caption: "추천하기" },
-      { src: "/guide/07_coach3.png", caption: "진상 등록" },
-      { src: "/guide/08_coach4.png", caption: "등록 버튼" },
-    ],
-  },
-  {
-    title: "3. 진상 등록하기",
+    title: "2. 진상 등록하기",
     desc: "전화번호를 입력하고 태그(폭력, 먹튀, 행패, 스토커, 블랙)를 선택한 후 등록하세요. 다른 업소에서도 이 정보를 볼 수 있습니다.",
     images: [
-      { src: "/guide/10_home.png", caption: "홈 화면" },
+      { src: "/guide/10_home.png", caption: "홈 화면 — 번호 입력 & 태그 선택" },
     ],
   },
   {
-    title: "4. 전화 수신 시 자동 감지",
-    desc: "전화가 오면 자동으로 진상 여부를 조회합니다. 진상이면 빨간 경고, 미등록이면 초록 안심 카드가 표시됩니다.",
+    title: "3. 전화 수신 시 자동 감지",
+    desc: "전화가 오면 자동으로 진상 여부를 조회합니다. 진상이면 빨간 경고 카드, 미등록이면 초록 안심 카드가 화면 중앙에 표시됩니다.",
     images: [
       { src: "/guide/11_jinsang_warning.png", caption: "🚨 진상 경고" },
       { src: "/guide/12_safe_overlay.png", caption: "✅ 안심 표시" },
     ],
   },
   {
-    title: "5. 내 업소 정보 관리",
+    title: "4. 내 업소 정보 관리",
     desc: "프로필에서 업소명, 지역, 업종을 설정하고 구독 상태를 확인할 수 있습니다. '업소명 공개' 토글로 다른 업소에 내 이름을 공유할 수 있어요.",
     images: [
       { src: "/guide/13_profile.png", caption: "프로필 화면" },
