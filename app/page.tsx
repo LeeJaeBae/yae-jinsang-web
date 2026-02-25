@@ -88,11 +88,11 @@ export default function Home() {
             <img src="/icon.svg" alt="얘진상" className="w-8 h-8" />
             <span className="text-lg font-bold">얘진상</span>
           </div>
-          <div className="hidden md:flex items-center gap-8 text-sm text-white/50">
-            <a href="#features" className="hover:text-white transition">기능</a>
-            <a href="/guide" className="hover:text-white transition">사용법</a>
-            <a href="#pricing" className="hover:text-white transition">가격</a>
-            <a href="#faq" className="hover:text-white transition">FAQ</a>
+          <div className="flex items-center gap-4 md:gap-8 text-xs md:text-sm text-white/50">
+            <a href="#features" className="hidden md:block hover:text-white transition">기능</a>
+            <a href="/guide" className="hover:text-white transition">📖 사용법</a>
+            <a href="#pricing" className="hidden md:block hover:text-white transition">가격</a>
+            <a href="#faq" className="hidden md:block hover:text-white transition">FAQ</a>
           </div>
           <a
             href="#download"
