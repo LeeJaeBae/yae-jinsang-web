@@ -90,7 +90,7 @@ export default function Home() {
           </div>
           <div className="hidden md:flex items-center gap-8 text-sm text-white/50">
             <a href="#features" className="hover:text-white transition">기능</a>
-            <a href="#how" className="hover:text-white transition">사용법</a>
+            <a href="/guide" className="hover:text-white transition">사용법</a>
             <a href="#pricing" className="hover:text-white transition">가격</a>
             <a href="#faq" className="hover:text-white transition">FAQ</a>
           </div>
