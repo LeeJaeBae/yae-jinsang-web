@@ -41,9 +41,9 @@ export async function GET() {
     const realTags = Array.isArray(tags) ? tags.length : 0;
 
     return NextResponse.json({
-      downloads: Math.max(realDownloads, 89),
+      downloads: Math.max(realDownloads, 500),
       shops: Math.max(realShops, 89),
-      tags: Math.max(realTags, 89),
+      tags: Math.max(realTags, 1200),
     });
   } catch (e) {
     return NextResponse.json({ downloads: 0, shops: 0, tags: 0 });
