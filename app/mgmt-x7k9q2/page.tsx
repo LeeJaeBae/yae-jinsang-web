@@ -35,7 +35,7 @@ export default function AdminPage() {
   const [stats, setStats] = useState({ total: 0, active: 0, expired: 0, tags: 0 });
   const [search, setSearch] = useState("");
   const [actionMsg, setActionMsg] = useState("");
-  const [tab, setTab] = useState<"shops" | "notices" | "payments">("shops");
+  const [tab, setTab] = useState<"shops" | "notices" | "payments" | "promos">("shops");
 
   // 계정 생성 폼
   const [newName, setNewName] = useState("");
@@ -49,6 +49,15 @@ export default function AdminPage() {
   // 입금 요청
   const [payments, setPayments] = useState<any[]>([]);
   const [paymentsLoading, setPaymentsLoading] = useState(false);
+
+  // 프로모 코드
+  const [promos, setPromos] = useState<any[]>([]);
+  const [promosLoading, setPromosLoading] = useState(false);
+  const [promoCode, setPromoCode] = useState("");
+  const [promoDays, setPromoDays] = useState(14);
+  const [promoMaxUses, setPromoMaxUses] = useState(100);
+  const [promoDesc, setPromoDesc] = useState("");
+  const [creatingPromo, setCreatingPromo] = useState(false);
 
   // 공지사항
   interface Notice {
@@ -145,6 +154,41 @@ export default function AdminPage() {
     setPaymentsLoading(false);
   }, []);
 
+  const loadPromos = useCallback(async () => {
+    setPromosLoading(true);
+    const { data } = await supabase
+      .from("promo_codes")
+      .select("*")
+      .order("created_at", { ascending: false });
+    setPromos(data || []);
+    setPromosLoading(false);
+  }, []);
+
+  const handleCreatePromo = async () => {
+    if (!promoCode) { showAction("❌ 코드를 입력하세요"); return; }
+    setCreatingPromo(true);
+    const { error } = await supabase.from("promo_codes").insert({
+      code: promoCode.toUpperCase(),
+      days_to_add: promoDays,
+      max_uses: promoMaxUses,
+      description: promoDesc || null,
+      is_active: true,
+    });
+    if (error) {
+      showAction(`❌ 생성 실패: ${error.message}`);
+    } else {
+      showAction(`✅ 프로모 코드 생성: ${promoCode.toUpperCase()}`);
+      setPromoCode(""); setPromoDays(14); setPromoMaxUses(100); setPromoDesc("");
+      loadPromos();
+    }
+    setCreatingPromo(false);
+  };
+
+  const togglePromoActive = async (id: string, active: boolean) => {
+    await supabase.from("promo_codes").update({ is_active: !active }).eq("id", id);
+    loadPromos();
+  };
+
   const handleCreateAccount = async () => {
     if (!newName || !newLoginId || !newPassword) {
       showAction("❌ 업소명, 아이디, 비밀번호는 필수입니다");
@@ -202,8 +246,9 @@ export default function AdminPage() {
       loadData();
       loadNotices();
       loadPayments();
+      loadPromos();
     }
-  }, [isAdmin, loadData, loadNotices, loadPayments]);
+  }, [isAdmin, loadData, loadNotices, loadPayments, loadPromos]);
 
   const showAction = (msg: string) => {
     setActionMsg(msg);
@@ -395,7 +440,7 @@ export default function AdminPage() {
 
         {/* Tabs */}
         <div className="flex gap-2 mb-6">
-          {(["shops", "notices", "payments"] as const).map((t) => (
+          {(["shops", "notices", "payments", "promos"] as const).map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
@@ -405,7 +450,7 @@ export default function AdminPage() {
                   : "bg-[#1A1A1A] text-white/40 hover:text-white/60"
               }`}
             >
-              {t === "shops" ? `🏪 업소 관리 (${stats.total})` : t === "notices" ? `📢 공지사항 (${notices.length})` : `💰 입금 (${payments.filter(p => p.status === "pending").length})`}
+              {t === "shops" ? `🏪 업소 (${stats.total})` : t === "notices" ? `📢 공지 (${notices.length})` : t === "payments" ? `💰 입금 (${payments.filter(p => p.status === "pending").length})` : `🎁 프로모 (${promos.length})`}
             </button>
           ))}
         </div>
@@ -576,6 +621,70 @@ export default function AdminPage() {
                 </div>
               ))
             )}
+          </div>
+        )}
+
+        {/* 프로모 코드 탭 */}
+        {tab === "promos" && (
+          <div className="space-y-6 mb-8">
+            <div className="bg-[#1A1A1A] border border-white/5 rounded-2xl p-6">
+              <h3 className="font-bold text-lg mb-4">➕ 새 프로모 코드</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <input placeholder="코드 (예: FREE2W)" value={promoCode} onChange={e => setPromoCode(e.target.value)}
+                  className="bg-[#252525] border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-500/40 uppercase" />
+                <input placeholder="설명" value={promoDesc} onChange={e => setPromoDesc(e.target.value)}
+                  className="bg-[#252525] border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-500/40" />
+                <div className="flex items-center gap-2">
+                  <span className="text-white/40 text-sm shrink-0">무료 기간</span>
+                  <input type="number" value={promoDays} onChange={e => setPromoDays(Number(e.target.value))}
+                    className="bg-[#252525] border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none w-24" />
+                  <span className="text-white/40 text-sm">일</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-white/40 text-sm shrink-0">최대 사용</span>
+                  <input type="number" value={promoMaxUses} onChange={e => setPromoMaxUses(Number(e.target.value))}
+                    className="bg-[#252525] border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none w-24" />
+                  <span className="text-white/40 text-sm">회</span>
+                </div>
+              </div>
+              <button onClick={handleCreatePromo} disabled={creatingPromo}
+                className="mt-4 bg-green-600 hover:bg-green-700 disabled:opacity-40 text-white font-bold px-6 py-3 rounded-xl text-sm transition">
+                {creatingPromo ? "생성 중..." : "코드 생성"}
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              {promosLoading ? (
+                <p className="text-white/40">로딩 중...</p>
+              ) : promos.length === 0 ? (
+                <div className="text-center py-20 text-white/20">프로모 코드가 없습니다</div>
+              ) : (
+                promos.map((p) => (
+                  <div key={p.id} className={`bg-[#1A1A1A] rounded-2xl p-5 border ${p.is_active ? "border-green-500/20" : "border-white/5 opacity-50"}`}>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="font-mono font-bold text-lg text-green-400">{p.code}</span>
+                        <span className={`text-xs ml-3 px-2 py-0.5 rounded-full ${p.is_active ? "bg-green-500/20 text-green-400" : "bg-red-500/20 text-red-400"}`}>
+                          {p.is_active ? "활성" : "비활성"}
+                        </span>
+                        <p className="text-sm text-white/40 mt-1">
+                          {p.days_to_add}일 무료 · {p.used_count}/{p.max_uses}회 사용 · {p.description || "설명 없음"}
+                        </p>
+                        <p className="text-xs text-white/20 mt-0.5">
+                          {new Date(p.created_at).toLocaleDateString("ko-KR")}
+                        </p>
+                      </div>
+                      <button onClick={() => togglePromoActive(p.id, p.is_active)}
+                        className={`text-xs px-3 py-2 rounded-lg transition ${
+                          p.is_active ? "bg-red-500/20 hover:bg-red-500/30 text-red-400" : "bg-green-500/20 hover:bg-green-500/30 text-green-400"
+                        }`}>
+                        {p.is_active ? "비활성화" : "활성화"}
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
           </div>
         )}
 
