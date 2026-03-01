@@ -157,8 +157,8 @@ export default function Home() {
             </div>
           </motion.div>
 
-          {/* 실시간 통계 카운터 */}
-          {stats && (stats.downloads > 0 || stats.shops > 0 || stats.tags > 0) && (
+          {/* 실시간 통계 카운터 — 가입자 생기면 다시 노출 */}
+          {false && stats && (stats.downloads > 0 || stats.shops > 0 || stats.tags > 0) && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
