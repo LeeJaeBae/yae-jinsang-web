@@ -46,10 +46,10 @@ const features = [
 ];
 
 const steps = [
-  { num: "01", title: "앱 설치", desc: "APK 다운로드 후 설치 (안드로이드)" },
-  { num: "02", title: "권한 허용", desc: "전화 스크리닝 + 화면 오버레이" },
-  { num: "03", title: "진상 등록", desc: "번호 + 태그로 블랙리스트 등록" },
-  { num: "04", title: "자동 감지", desc: "전화 오면 즉시 경고!" },
+  { num: "01", title: "가입 신청", desc: "텔레그램 @yae_jinsang 으로 업소명·전화번호 전송" },
+  { num: "02", title: "계정 발급", desc: "확인 후 아이디/비밀번호 발급 (보통 1시간 내)" },
+  { num: "03", title: "앱 설치", desc: "APK 다운로드 후 설치 → 로그인" },
+  { num: "04", title: "자동 감지", desc: "전화 오면 즉시 진상 경고!" },
 ];
 
 export default function Home() {
@@ -103,10 +103,12 @@ export default function Home() {
             <a href="#faq" className="hidden md:block hover:text-white transition">FAQ</a>
           </div>
           <a
-            href="#download"
-            className="bg-brand-red hover:bg-brand-red/80 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition"
+            href="https://t.me/yae_jinsang"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-[#29B6F6] hover:bg-[#29B6F6]/80 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition"
           >
-            다운로드
+            ✈️ 가입 신청
           </a>
         </div>
       </nav>
@@ -540,21 +542,31 @@ export default function Home() {
               <br />
               진상은 걸러내고, 에이스는 지켜내고.
             </p>
-            <a
-              href="https://github.com/LeeJaeBae/yae-jinsang/releases/latest/download/app-release.apk"
-              className="inline-flex items-center gap-3 bg-brand-red hover:bg-brand-red/80 text-white font-bold text-lg px-10 py-5 rounded-2xl transition animate-pulse-glow"
-            >
-              <svg
-                className="w-6 h-6"
-                fill="currentColor"
-                viewBox="0 0 24 24"
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <a
+                href="https://t.me/yae_jinsang"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-3 bg-[#29B6F6] hover:bg-[#29B6F6]/80 text-white font-bold text-lg px-10 py-5 rounded-2xl transition animate-pulse-glow"
               >
-                <path d="M17.523 2.246a.75.75 0 0 0-1.046 0L14.5 4.223 13.024 2.746a.75.75 0 1 0-1.048 1.072l1.3 1.27A7.5 7.5 0 0 0 4.5 12v.75h15V12a7.5 7.5 0 0 0-8.776-7.412l1.3-1.27a.75.75 0 0 0-.001-1.072ZM4.5 14.25v4.5A3.25 3.25 0 0 0 7.75 22h8.5a3.25 3.25 0 0 0 3.25-3.25v-4.5h-15Z" />
-              </svg>
-              Android APK 다운로드
-            </a>
+                ✈️ 텔레그램으로 가입 신청
+              </a>
+              <a
+                href="https://github.com/LeeJaeBae/yae-jinsang/releases/latest/download/app-release.apk"
+                className="inline-flex items-center gap-3 bg-brand-red hover:bg-brand-red/80 text-white font-bold text-lg px-10 py-5 rounded-2xl transition"
+              >
+                <svg
+                  className="w-6 h-6"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M17.523 2.246a.75.75 0 0 0-1.046 0L14.5 4.223 13.024 2.746a.75.75 0 1 0-1.048 1.072l1.3 1.27A7.5 7.5 0 0 0 4.5 12v.75h15V12a7.5 7.5 0 0 0-8.776-7.412l1.3-1.27a.75.75 0 0 0-.001-1.072ZM4.5 14.25v4.5A3.25 3.25 0 0 0 7.75 22h8.5a3.25 3.25 0 0 0 3.25-3.25v-4.5h-15Z" />
+                </svg>
+                APK 다운로드
+              </a>
+            </div>
             <p className="text-white/30 text-sm mt-4">
-              안드로이드 10 이상 · 51MB
+              텔레그램으로 업소명·전화번호 보내면 계정 발급해드립니다
             </p>
           </motion.div>
         </div>
