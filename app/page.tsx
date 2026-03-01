@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -55,6 +55,14 @@ const steps = [
 export default function Home() {
   const [faqOpen, setFaqOpen] = useState<number | null>(null);
   const [plan, setPlan] = useState<"monthly" | "yearly">("monthly");
+  const [stats, setStats] = useState<{ downloads: number; shops: number; tags: number } | null>(null);
+
+  useEffect(() => {
+    fetch("/api/stats")
+      .then((r) => r.json())
+      .then((d) => setStats(d))
+      .catch(() => {});
+  }, []);
 
   const faqs = [
     {
@@ -148,6 +156,29 @@ export default function Home() {
               </a>
             </div>
           </motion.div>
+
+          {/* 실시간 통계 카운터 */}
+          {stats && (stats.downloads > 0 || stats.shops > 0 || stats.tags > 0) && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8, duration: 0.6 }}
+              className="flex justify-center gap-8 md:gap-16 mt-12 mb-4"
+            >
+              <div className="text-center">
+                <p className="text-3xl md:text-4xl font-black text-brand-red">{stats.downloads.toLocaleString()}</p>
+                <p className="text-xs md:text-sm text-white/40 mt-1">다운로드</p>
+              </div>
+              <div className="text-center">
+                <p className="text-3xl md:text-4xl font-black text-white">{stats.shops.toLocaleString()}</p>
+                <p className="text-xs md:text-sm text-white/40 mt-1">등록 업소</p>
+              </div>
+              <div className="text-center">
+                <p className="text-3xl md:text-4xl font-black text-orange-500">{stats.tags.toLocaleString()}</p>
+                <p className="text-xs md:text-sm text-white/40 mt-1">진상 등록</p>
+              </div>
+            </motion.div>
+          )}
 
           {/* Phone mockup */}
           <motion.div
