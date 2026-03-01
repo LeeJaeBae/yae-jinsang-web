@@ -35,7 +35,20 @@ export default function AdminPage() {
   const [stats, setStats] = useState({ total: 0, active: 0, expired: 0, tags: 0 });
   const [search, setSearch] = useState("");
   const [actionMsg, setActionMsg] = useState("");
-  const [tab, setTab] = useState<"shops" | "notices">("shops");
+  const [tab, setTab] = useState<"shops" | "notices" | "payments">("shops");
+
+  // 계정 생성 폼
+  const [newName, setNewName] = useState("");
+  const [newPhone, setNewPhone] = useState("");
+  const [newLoginId, setNewLoginId] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [newRegion, setNewRegion] = useState("");
+  const [newCategory, setNewCategory] = useState("");
+  const [creating, setCreating] = useState(false);
+
+  // 입금 요청
+  const [payments, setPayments] = useState<any[]>([]);
+  const [paymentsLoading, setPaymentsLoading] = useState(false);
 
   // 공지사항
   interface Notice {
@@ -121,12 +134,76 @@ export default function AdminPage() {
     setNotices((data || []) as Notice[]);
   }, []);
 
+  const loadPayments = useCallback(async () => {
+    setPaymentsLoading(true);
+    const { data } = await supabase
+      .from("payment_requests")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(50);
+    setPayments(data || []);
+    setPaymentsLoading(false);
+  }, []);
+
+  const handleCreateAccount = async () => {
+    if (!newName || !newLoginId || !newPassword) {
+      showAction("❌ 업소명, 아이디, 비밀번호는 필수입니다");
+      return;
+    }
+    setCreating(true);
+    try {
+      const encoder = new TextEncoder();
+      const hashBuf = await crypto.subtle.digest("SHA-256", encoder.encode(newPassword));
+      const pwHash = Array.from(new Uint8Array(hashBuf)).map(b => b.toString(16).padStart(2, "0")).join("");
+
+      const { error } = await supabase.from("shops").insert({
+        id: crypto.randomUUID(),
+        name: newName,
+        login_id: newLoginId,
+        password_hash: pwHash,
+        owner_phone: newPhone || null,
+        region: newRegion || null,
+        category: newCategory || null,
+        is_active: true,
+        subscription_until: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+      });
+
+      if (error) {
+        showAction(`❌ 생성 실패: ${error.message}`);
+      } else {
+        showAction(`✅ 계정 생성 완료! 아이디: ${newLoginId} / 비밀번호: ${newPassword}`);
+        setNewName(""); setNewPhone(""); setNewLoginId(""); setNewPassword("");
+        setNewRegion(""); setNewCategory("");
+        loadData();
+      }
+    } catch (e: any) {
+      showAction(`❌ 오류: ${e.message}`);
+    }
+    setCreating(false);
+  };
+
+  const handlePaymentAction = async (id: string, action: "approve" | "reject") => {
+    try {
+      await fetch("/api/payment-approve", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, action, secret: "jinsang-admin-2024" }),
+      });
+      showAction(action === "approve" ? "✅ 입금 승인 완료" : "❌ 입금 거절 완료");
+      loadPayments();
+      loadData();
+    } catch (e: any) {
+      showAction(`❌ 처리 실패: ${e.message}`);
+    }
+  };
+
   useEffect(() => {
     if (isAdmin) {
       loadData();
       loadNotices();
+      loadPayments();
     }
-  }, [isAdmin, loadData, loadNotices]);
+  }, [isAdmin, loadData, loadNotices, loadPayments]);
 
   const showAction = (msg: string) => {
     setActionMsg(msg);
@@ -318,7 +395,7 @@ export default function AdminPage() {
 
         {/* Tabs */}
         <div className="flex gap-2 mb-6">
-          {(["shops", "notices"] as const).map((t) => (
+          {(["shops", "notices", "payments"] as const).map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
@@ -328,7 +405,7 @@ export default function AdminPage() {
                   : "bg-[#1A1A1A] text-white/40 hover:text-white/60"
               }`}
             >
-              {t === "shops" ? `🏪 업소 관리 (${stats.total})` : `📢 공지사항 (${notices.length})`}
+              {t === "shops" ? `🏪 업소 관리 (${stats.total})` : t === "notices" ? `📢 공지사항 (${notices.length})` : `💰 입금 (${payments.filter(p => p.status === "pending").length})`}
             </button>
           ))}
         </div>
@@ -455,8 +532,85 @@ export default function AdminPage() {
           </div>
         )}
 
+        {/* 입금 요청 탭 */}
+        {tab === "payments" && (
+          <div className="space-y-3 mb-8">
+            {paymentsLoading ? (
+              <p className="text-white/40">로딩 중...</p>
+            ) : payments.length === 0 ? (
+              <div className="text-center py-20 text-white/20">입금 요청이 없습니다</div>
+            ) : (
+              payments.map((r) => (
+                <div key={r.id} className={`bg-[#1A1A1A] rounded-2xl p-5 border ${
+                  r.status === "pending" ? "border-orange-500/30" : r.status === "approved" ? "border-green-500/20" : "border-red-500/20"
+                }`}>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="font-bold text-lg">{r.depositor_name || "미입력"}</span>
+                      <span className="text-orange-400 ml-3 font-bold">{Number(r.amount).toLocaleString()}원</span>
+                      <span className="text-white/30 text-sm ml-2">{r.plan === "yearly" ? "연간" : "월간"}</span>
+                      <span className={`text-xs ml-3 px-2 py-0.5 rounded-full ${
+                        r.status === "pending" ? "bg-orange-500/20 text-orange-400" :
+                        r.status === "approved" ? "bg-green-500/20 text-green-400" :
+                        "bg-red-500/20 text-red-400"
+                      }`}>
+                        {r.status === "pending" ? "대기" : r.status === "approved" ? "승인" : "거절"}
+                      </span>
+                      <p className="text-xs text-white/30 mt-1">
+                        {new Date(r.created_at).toLocaleString("ko-KR")} · <span className="text-[10px]">{r.shop_id}</span>
+                      </p>
+                    </div>
+                    {r.status === "pending" && (
+                      <div className="flex gap-2 ml-4">
+                        <button onClick={() => handlePaymentAction(r.id, "approve")}
+                          className="text-xs bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold transition">
+                          ✅ 승인
+                        </button>
+                        <button onClick={() => handlePaymentAction(r.id, "reject")}
+                          className="text-xs bg-red-500/20 hover:bg-red-500/40 text-red-400 px-4 py-2 rounded-lg transition">
+                          거절
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        )}
+
         {/* Search + Refresh */}
-        {tab === "shops" && <><div className="flex gap-3 mb-6">
+        {tab === "shops" && <>
+        {/* 계정 생성 */}
+        <div className="bg-[#1A1A1A] rounded-2xl p-6 mb-6 border border-white/5">
+          <h3 className="font-bold text-lg mb-4">➕ 새 계정 생성</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <input placeholder="업소명 *" value={newName} onChange={e => setNewName(e.target.value)}
+              className="bg-[#252525] border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500/40" />
+            <input placeholder="아이디 *" value={newLoginId} onChange={e => setNewLoginId(e.target.value)}
+              className="bg-[#252525] border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500/40" />
+            <input placeholder="비밀번호 *" value={newPassword} onChange={e => setNewPassword(e.target.value)}
+              className="bg-[#252525] border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500/40" />
+            <input placeholder="전화번호" value={newPhone} onChange={e => setNewPhone(e.target.value)}
+              className="bg-[#252525] border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500/40" />
+            <select value={newRegion} onChange={e => setNewRegion(e.target.value)}
+              className="bg-[#252525] border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none">
+              <option value="">지역</option>
+              {["서울","부산","대구","인천","광주","대전","울산","세종","경기","강원","충북","충남","전북","전남","경북","경남","제주"].map(r => <option key={r} value={r}>{r}</option>)}
+            </select>
+            <select value={newCategory} onChange={e => setNewCategory(e.target.value)}
+              className="bg-[#252525] border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none">
+              <option value="">업종</option>
+              {["노래방","클럽","바","라운지","룸살롱","가라오케","마사지","스파","기타"].map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+          </div>
+          <button onClick={handleCreateAccount} disabled={creating}
+            className="mt-4 bg-orange-600 hover:bg-orange-700 disabled:opacity-40 text-white font-bold px-6 py-3 rounded-xl text-sm transition">
+            {creating ? "생성 중..." : "계정 생성"}
+          </button>
+        </div>
+
+        <div className="flex gap-3 mb-6">
           <input
             type="text"
             value={search}
